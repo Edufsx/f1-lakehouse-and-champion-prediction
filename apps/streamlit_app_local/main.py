@@ -112,7 +112,7 @@ st.markdown(
     Aplicação interativa para análise e predição da probabilidade de pilotos se tornarem 
     campeões de temporadas da Fórmula 1, utilizando modelos de Machine Learning.
 
-    Repositório do código: [https://github.com/Edufsx/f1-lake](https://github.com/Edufsx/f1-lake)
+    Repositório do código: [https://github.com/Edufsx/f1-lakehouse-and-champion-prediction](https://github.com/Edufsx/f1-lakehouse-and-champion-prediction)
     """
 )
 
