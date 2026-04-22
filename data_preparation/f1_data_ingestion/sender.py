@@ -8,10 +8,13 @@ from tqdm import tqdm
 # Carrega as variáveis do arquivo .env 
 dotenv.load_dotenv()
 
-# Carregas as chaves de acesso da AWS
+# Carregas as chaves de acesso da AWS 
 AWS_KEY = os.getenv("AWS_KEY")
 AWS_SECRET_KEY = os.getenv("AWS_SECRET_KEY")
 
+# Carrega nome e caminho do bucket S3 onde os dados serão armazenados
+BUCKET_NAME = os.getenv("BUCKET_NAME")
+BUCKET_PATH = os.getenv("BUCKET_PATH")
 #%%
 class Sender:
     """
@@ -117,18 +120,13 @@ if __name__ == "__main__":
     
     parser = argparse.ArgumentParser()
 
-    # Argumento obrigatório: nome do bucket
-    parser.add_argument("--bucket", type=str)
-    
-    parser.add_argument("--bucket_path", type=str)
+    # Argumentos para o envio 
+    parser.add_argument("--bucket", default=BUCKET_NAME, type=str)
+    parser.add_argument("--bucket_path", default=BUCKET_PATH, type=str)
     parser.add_argument("--folder", default="data/raw", type=str)
     
     args = parser.parse_args()
     
-    # Executa apenas se o bucket for informado
-    if args.bucket:
-        send = Sender(args.bucket, args.bucket_path)
-        send.process_folder(args.folder)
-
-    else:
-        print("Sem Bucket definido")
+    # Executa o envio
+    send = Sender(args.bucket, args.bucket_path)
+    send.process_folder(args.folder)

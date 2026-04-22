@@ -39,3 +39,4 @@ streamlit==1.54.0
 uvicorn==0.41.0
 waitress==3.0.2
 wheel==0.45.1
+fastf1==3.8.1

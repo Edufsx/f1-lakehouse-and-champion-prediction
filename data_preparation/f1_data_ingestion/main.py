@@ -9,9 +9,9 @@ import time
 # Carrega variáveis ambiente
 dotenv.load_dotenv()
 
-# Nome do bucket S3 onde os dados serão armazenados
+# Nome e caminho do bucket S3 onde os dados serão armazenados
 BUCKET_NAME = os.getenv("BUCKET_NAME")
-
+BUCKET_PATH = os.getenv("BUCKET_PATH")
 #%%
 
 # Loop contínuo para coleta e envio periódico de dados da Fórmula 1
@@ -32,7 +32,7 @@ while True:
     # Envia os dados coletados para o bucket S3 
     sender_data = Sender(
         bucket_name=BUCKET_NAME, 
-        bucket_folder="f1/results"
+        bucket_folder=BUCKET_PATH
     )
     sender_data.process_folder("data/raw")
 

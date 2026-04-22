@@ -27,51 +27,38 @@ spark = (
 
 # Estabelece a engine de execução do Nekt como Spark
 nekt.engine = "spark"
-#%%
-# Carrega feature histórica dos pilotos localizada na nekt como view temporária
-nekt.load_table(
-    layer_name="Silver",
-    table_name="fs_f1_driver_all",
-).createOrReplaceTempView("fs_f1_driver_all")
 
 #%%
-# Carrega tabela com campeões históricos como view temporária
+# --- Analytical Base Table (ABT) ---
+# Carrega a ABT
 nekt.load_table(
-    layer_name="Silver",
-    table_name="f1_champions",
-).createOrReplaceTempView("f1_champions")
+    layer_name="Gold",
+    table_name="abt_f1_champion",
+).createOrReplaceTempView("abt_f1_champion")
 
-#%%
-# Consulta para criação da Analytical Base Table (ABT)
+# Consulta da ABT para treinamento do modelo
 query_abt = """
-WITH tb_abt AS (
-
-  SELECT t1.*,
-        COALESCE(t2.rankDriver, 0) AS flChampion
-  FROM fs_f1_driver_all AS t1
-
-  LEFT JOIN f1_champions AS t2
-  ON t1.driverid = t2.driverid
-  AND EXTRACT(YEAR FROM t1.dt_ref) = t2.year
-
-  WHERE t1.dt_ref >= DATE('2000-01-01') 
-  AND t1.dt_ref < DATE('2026-01-01')
-
-)
-
 SELECT *
-FROM tb_abt
+FROM abt_f1_champion
 """
 
 # Executa a consulta da ABT e a transforma em DataFrame
 df_abt = spark.sql(query_abt).toPandas()
 
+#%%
 # Salva a ABT em formato CSV
 df_abt.to_csv("data/processed/abt_f1_drivers_champion.csv", 
           index=False,
           sep=";")
 
 #%%
+# --- Feature Store F1 Driver All ---
+# Carrega feature histórica dos pilotos localizada na nekt como view temporária
+nekt.load_table(
+    layer_name="Gold",
+    table_name="fs_f1_driver_all",
+).createOrReplaceTempView("fs_f1_driver_all")
+
 # Consulta da feature store contendo dados mais recentes para predição
 query_fs_all = """
 SELECT *
@@ -79,12 +66,14 @@ FROM fs_f1_driver_all
 """
 # Executa a consulta com dados para predição
 df_fs_all = spark.sql(query_fs_all)
+
 #%%
 # Cria arquivo no formato parquet em uma pasta temporária
 (df_fs_all.write.mode("overwrite")
  .option("header", True)
  .option("sep", ";")
  .parquet("data/fs_f1_driver_all_tmp"))
+
 #%%
 # Caminho da pasta temporária e da pasta final
 output_folder = "data/fs_f1_driver_all_tmp"

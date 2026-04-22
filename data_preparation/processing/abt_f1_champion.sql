@@ -10,7 +10,7 @@ WITH tb_abt AS (
          -- Variável alvo (target): 
          -- Indica se o piloto foi campeão (1) ou não (0) na temporada
          COALESCE(t2.rankDriver, 0) AS flChampion
-  FROM `f1_lake_2_silver`.`fs_f1_driver_all` AS t1
+  FROM `f1_lake_2_gold`.`fs_f1_driver_all` AS t1
 
   -- Tabela de campeões para criação da variável alvo
   LEFT JOIN `f1_lake_2_silver`.`f1_champions` AS t2
